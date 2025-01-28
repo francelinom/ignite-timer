@@ -54,12 +54,17 @@ export function Home() {
     const activeCyrcle = cyrcle.find((cyrcle) => cyrcle.id === activeCyrcleId)
 
     useEffect(() => {
+        let interval: number
         if (activeCyrcle) {
-            setInterval(() => {
+            interval = setInterval(() => {
                 setAmountSecondsPassed(
                     differenceInSeconds(new Date(), activeCyrcle.startDate)
                 )
             }, 1000)
+        }
+
+        return () => {
+            clearInterval(interval)
         }
     }, [activeCyrcle])
 
@@ -74,10 +79,10 @@ export function Home() {
 
         setCyrcle(((state) => [...state, newCyrcle]))
         setCyrcleId(id)
+        setAmountSecondsPassed(0)
+
         reset()
     }
-
-
 
     const totalSeconds = activeCyrcle ? activeCyrcle.minutesAmount * 60 : 0
     const currentSeconds = activeCyrcle ? totalSeconds - amountSecondsPassed : 0
@@ -90,6 +95,12 @@ export function Home() {
 
     const task = watch('task')
     const isSubmitDisabled = !task
+
+    useEffect(() => {
+        if (activeCyrcle) {
+            document.title = `${minutes}:${seconds}`
+        }
+    }, [minutes, seconds, activeCyrcle])
 
     return (
         <HomeContainer>
